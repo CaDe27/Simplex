@@ -1,0 +1,38 @@
+
+
+State of the simplex matrix:
+Estado actual de A
+-1		3		1		0		3		
+2		-1		0		1		4		
+-1		-1		0		0		0		
+
+variable that enters the basis: 0
+pivot row: 1
+Elementary operations for this step:
+	R1 <- (1/2)R1
+	R0 <- R0 - (-1)R1
+	R2 <- R2 - (-1)R1
+
+
+State of the simplex matrix:
+Estado actual de A
+0		5/2		1		1/2		5		
+1		-1/2		0		1/2		2		
+0		-3/2		0		1/2		2		
+
+variable that enters the basis: 1
+pivot row: 0
+Elementary operations for this step:
+	R0 <- (2/5)R0
+	R1 <- R1 - (-1/2)R0
+	R2 <- R2 - (-3/2)R0
+
+
+State of the simplex matrix:
+Estado actual de A
+0		1		2/5		1/5		2		
+1		0		1/5		3/5		3		
+0		0		3/5		4/5		5		
+
+variable that enters the basis: -1
+we reached an optimal
