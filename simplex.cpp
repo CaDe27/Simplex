@@ -5,8 +5,6 @@ using namespace std;
 
 #define loop(i, a, b) for(int i = a; i < b; ++i)
 
-  
-
 //multiplies the row by the rescaling factor
 template <class dataType>
 void rescaleRow(vector<vector<dataType> > &A, int row, dataType rescale){
@@ -15,6 +13,7 @@ void rescaleRow(vector<vector<dataType> > &A, int row, dataType rescale){
         A[row][j] = A[row][j]*rescale;
 }
 
+//simulates an elementary operation to sum the rescaled pivotRow to the destination row
 template <class dataType>
 void sumMultipleOfRow(vector<vector<dataType> > &A, int pivotRow, int row, dataType rescale){
     int cols = A[0].size();
@@ -42,6 +41,11 @@ int newPivotColumn(vector<vector<dataType> > &A){
     return newPivot;
 }
 
+/*
+    returns the row to be used as pivot for a certain column
+    it takes the row that has the minimum bi/xi
+    if there are multiple, it takes the first row that has the value 
+*/
 template<class dataType>
 int newPivotRow(vector< vector<dataType> > &A, int column){
     int rows = A.size(), pivotRow = -1, lastColumn = A[0].size() - 1;
@@ -55,6 +59,11 @@ int newPivotRow(vector< vector<dataType> > &A, int column){
     return pivotRow;
 }
 
+/*
+    given a matrix representing the standard form of a Lineal Programming problem, 
+    its solves the problem using the simplex method
+    (it either reaches an optimal value or stops if there is no optimal)
+*/
 template <class dataType>
 void simplex(vector<vector<dataType> > &A){
     //select the variable used as a pivot
@@ -102,17 +111,18 @@ void simplex(vector<vector<dataType> > &A){
             }
         }
     }while(!(hasReachedOptimal || noOptimalExists));
-
 }
-
-
-
-
-
 
 int main(){
     vector< vector<fraction> >A;
 
+    /*this represents the problem:
+        max z = x1 + x2 
+        sa. 
+            x2 <= 1/3 * x + 3
+            x2 >= 2x - 4
+        which has max at (3, 2) with z = 5
+    */
     fraction a1[] = {fraction(-1), fraction(3), fraction(1), fraction (0), fraction(3) };
     fraction a2[] = {fraction(2), fraction(-1), fraction(0), fraction (1), fraction(4)};
     fraction a3[] = {fraction(-1), fraction(-1), fraction(0), fraction (0), fraction(0)};
