@@ -65,7 +65,7 @@ int newPivotRow(vector< vector<dataType> > &A, int column){
     (it either reaches an optimal value or stops if there is no optimal)
 */
 template <class dataType>
-void simplex(vector<vector<dataType> > &A){
+void simplex(vector<vector<dataType> > &A, vector<int> &canonical){
     //select the variable used as a pivot
     int rows = A.size(), columns = A[0].size();
     int indexNewVariable, pivotRow = -1;
@@ -90,13 +90,17 @@ void simplex(vector<vector<dataType> > &A){
             pivotRow = newPivotRow(A, indexNewVariable);
             //if the pivotRow == -1, all entries are negative or zero
             //and the problem has no optimal solution
-            cout<<"pivot row: "<<pivotRow<<endl;
             if(indexNewVariable == -1){
                 cout<<"there is no row to use as pivot, the problem has no optimal value"<<endl;
                 noOptimalExists = true;
             }
         }
         if(hasReachedOptimal || noOptimalExists) break;
+
+        cout<<"pivot row"<<pivotRow<<"\n";
+        //we store the new basic variable and the canonical vector
+        //it represents
+        canonical[pivotRow] = indexNewVariable;
 
         //rescale row for the pivot to be 1
         cout<<"Elementary operations for this step:"<<endl;
@@ -113,9 +117,53 @@ void simplex(vector<vector<dataType> > &A){
     }while(!(hasReachedOptimal || noOptimalExists));
 }
 
+/*
+    Parameters:
+        A - simplex matrix in standard form
+
+    Returns:
+        vector containing the answer to the problem
+        represented by A
+*/
+template <class dataType> 
+vector<int> twoPhaseSimplexMethod(vector< vector<dataType> > &A){
+    int rows = A.size(), restrictions = rows - 1;
+    if(rows == 0)
+        throw "There are no restrictions in the problem";
+    int columns = A[0].size(), variables = columns - 1;
+    if(columns == 0)
+        throw "There are no columns in matrix";
+    
+    vector<dataType> costFunctionCoefficients = A[rows - 1];
+    //we add columns to have the canonical basis from start 
+    //the number of columns we have is equal to the amount of restrictions
+    int newColumns = columns + restrictions;
+    loop(i, 0, rows)
+        A[i].resize(newColumns);
+
+    //we reassign the restriction-rows' coefficients 
+    loop(i, 0, rows-1){
+        //we reassing bi to the last column 
+        A[i][newColumns - 1] = A[i][columns - 1];
+        //we fill the new variables coefficients 
+        loop(j, columns - 1, newColumns - 1)
+            A[i][j] = dataType(0);
+        A[i][columns - 1 + i] = 1; 
+    }
+    
+    //we fill the cost function of the first phase problem
+    //for the first variables the cost is the minus sum of the column elements
+    loop(j, 0, columns - 1){
+        dataType sum = 0;
+        loop(i, 0, rows-1)
+            sum = sum + A[i][j];
+        A[rows - 1][j] = 
+    }   
+}
+    
+
 int main(){
     vector< vector<fraction> >A;
-
     /*this represents the problem:
         max z = x1 + x2 
         sa. 
@@ -132,5 +180,5 @@ int main(){
     A.push_back(vector<fraction> (a2, a2+size));
     A.push_back(vector<fraction> (a3, a3+size));
 
-    simplex(A);
+    //simplex(A);
 }
