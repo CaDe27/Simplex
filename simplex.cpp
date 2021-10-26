@@ -158,7 +158,7 @@ void transformToFirstPhaseMatrix(vector< vector<dataType> > &A, vector<int> &can
     print(A);
 
     cout<<"Before executing simplex, we need to make relative cost of basis variables zero\n";
-    cout<<"This is acomplished by adding each restriction row to the cost row\n";
+    cout<<"This is accomplished by adding each restriction row to the cost row\n";
 
     //we fill the cost function of the first phase problem
     //for the first variables and the bi column, the cost is the minus sum of the column elements

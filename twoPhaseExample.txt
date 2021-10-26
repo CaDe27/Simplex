@@ -12,7 +12,7 @@ Current state of A
 0		0		0		0		1		1		0		
 
 Before executing simplex, we need to make relative cost of basis variables zero
-This is acomplished by adding each restriction row to the cost row
+This is accomplished by adding each restriction row to the cost row
 First phase matrix
 Current state of A
 3		4		1		0		1		0		20		
