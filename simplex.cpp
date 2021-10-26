@@ -117,29 +117,28 @@ void simplex(vector<vector<dataType> > &A, vector<int> &canonical){
     }while(!(hasReachedOptimal || noOptimalExists));
 }
 
-/*
-    Parameters:
-        A - simplex matrix in standard form
-
-    Returns:
-        vector containing the answer to the problem
-        represented by A
-*/
-template <class dataType> 
-void twoPhaseSimplexMethod(vector< vector<dataType> > &A){
-    int rows = A.size(), restrictions = rows - 1;
+template<class dataType>
+void validateData(vector< vector<dataType> > &A){
+    int rows = A.size();
     if(rows == 0)
         throw "There are no restrictions in the problem";
     int columns = A[0].size();
     if(columns == 0)
         throw "There are no columns in matrix";
-    
-    int costRow = rows - 1;
-    vector<dataType> costFunctionCoefficients = A[costRow];
+}
+
+template<class dataType>
+void transformToFirstPhaseMatrix(vector< vector<dataType> > &A, vector<int> &canonical){
+    cout<<"Original standard problem matrix\n";
+    print(A);
+
+    int rows = A.size(), restrictions = rows - 1, costRow = rows - 1;
     //we add columns to have the canonical basis from start 
     //the number of columns we have is equal to the amount of restrictions
-    int newColumns = columns + restrictions;
-    int originalBiColumn = columns - 1, newBiColumn = newColumns - 1;
+    int columns = A[0].size(), newColumns = columns + restrictions, 
+        originalBiColumn = columns - 1, newBiColumn = newColumns - 1;
+    
+    //we resize the matrix to add the columns
     loop(i, 0, rows)
         A[i].resize(newColumns);
 
@@ -148,11 +147,19 @@ void twoPhaseSimplexMethod(vector< vector<dataType> > &A){
         //we reassing bi to the last column 
         A[i][newBiColumn] = A[i][originalBiColumn];
         //we fill the new variables coefficients 
-        loop(j, originalBiColumn, newBiColumn)
-            A[i][j] = dataType(0);
+        fill(A[i].begin() + originalBiColumn, A[i].begin() + newBiColumn, dataType(0));
         A[i][originalBiColumn + i] = 1; 
     }
-    
+    //we fill cost function row
+    fill(A[costRow].begin(), A[costRow].begin() + columns - 1, dataType(0));
+    fill(A[costRow].begin() + columns - 1, A[costRow].end() - 1, dataType(1));
+    cout<<"For first phase problem we consider the cost function: SumOfTheNewVariables \n";
+    cout<<"First phase problem matrix\n";
+    print(A);
+
+    cout<<"Before executing simplex, we need to make relative cost of basis variables zero\n";
+    cout<<"This is acomplished by adding each restriction row to the cost row\n";
+
     //we fill the cost function of the first phase problem
     //for the first variables and the bi column, the cost is the minus sum of the column elements
     loop(j, 0, originalBiColumn){
@@ -170,44 +177,124 @@ void twoPhaseSimplexMethod(vector< vector<dataType> > &A){
     //for bi and the new variables te cost is cero
     loop(j, originalBiColumn, newBiColumn)
         A[costRow][j] = 0;
-
-    vector<int> canonical(restrictions);
+    
+    //we initialize the indexes of the basic variables
+    //specifying what variable corresponds to which canonical vector
     loop(i, 0, restrictions)
         canonical[i] = originalBiColumn + i;
-    simplex(A, canonical);
+    
+    cout<<"First phase matrix\n";
+    print(A);
+}
 
-    //we construct the second phase matrix 
-    //we do it anyway since A is modified with the method
-
+template<class dataType>
+bool transformToSecondPhaseMatrix(vector< vector<dataType> > &A, vector<int> &canonical, vector<dataType> &costFunctionCoefficients){
+    int rows = A.size(), columns = A[0].size() - (rows - 1), firstPhaseColumns = A[0].size();
+    dataType optimalValueOfFirstPhase = A[rows - 1][firstPhaseColumns - 1];
+    
     //if the first phase doesn't have 0 as the answer, then the solution space of the 
     //original problem is empty
-    if(A[costRow][newBiColumn] != 0){
-        cout<<the
+    bool solutionSpaceIsEmpty = !(optimalValueOfFirstPhase == dataType(0));
+
+    //we take bi to original bi column and resize the row
+    loop(i, 0, rows){
+        A[i][columns - 1] = A[i][firstPhaseColumns - 1];
+        A[i].resize(columns);
     }
-    //if not empty, we make the relative cost of the basic variables in the new cost function is cero
 
-    //we know solve the second phase problem
+    //we put the original costFunction
+    int costRow = rows - 1;
+    A[costRow] = costFunctionCoefficients;
 
-    //we return the state of the variables
-    cout<<"canonical indexes: "<<endl;
-    loop(i, 0, restrictions)
-        cout<<canonical[i]<<" ";
-    cout<<endl;
+    cout<<"\nSecond phase matrix\n";
+    print(A);
+    cout<<"\nBefore executing simplex, we need to transform the relative cost of basic variables to zero\n";
+    cout<<"Operations to do so:\n";
+    if (!solutionSpaceIsEmpty){
+        //we make the basis vectors relative costs equal to zero 
+        loop(i, 0, rows - 1){
+            cout<<"\tR"<<(rows-1)<<" <- R"<<(rows - 1)<<" - ("<<A[rows - 1][ canonical[i] ].toString()<<")R"<<i<<endl;
+            sumMultipleOfRow(A, i, rows - 1, A[rows - 1][ canonical[i] ]);
+            print(A);
+        }
+    }
+    return solutionSpaceIsEmpty;
+}
+
+/*
+    Parameters:
+        A - simplex matrix in standard form
+
+    Returns:
+        vector containing the answer to the problem
+        represented by A
+*/
+template <class dataType> 
+void twoPhaseSimplexMethod(vector< vector<dataType> > &A){
+    validateData(A);
+    int rows = A.size(), restrictions = rows - 1, costRow = rows - 1, columns = A[0].size();
+    vector<dataType> costFunctionCoefficients = A[costRow];
+    vector<int> canonical(restrictions);
+    transformToFirstPhaseMatrix(A, canonical);
+    cout<<"\n ========== We start the first phase problem\n";
+    simplex(A, canonical);
+    //we construct the second phase matrix 
+    //we do it anyway since A is modified with the method
+    bool solutionSpaceEmpty = transformToSecondPhaseMatrix(A, canonical, costFunctionCoefficients);
+    cout<<"\n ========== We start the second phase problem\n";
+    if(solutionSpaceEmpty)
+        cout<<"The solution space is empty and we cannot proceed\n";
+    else{
+        simplex(A, canonical);
+        cout<<endl;
+        //we fill the original variables values
+        vector<dataType> originalV(columns - 1, dataType(0));
+        loop(i, 0, rows - 1)
+            originalV[ canonical[i] ] = A[i][columns - 1];
+        
+        cout<<"State of the standard problem variables: "<<endl;
+        loop(i, 0, columns - 1)
+            cout<<originalV[i].toString()<<" ";
+        cout<<endl;
+        cout<<"optimal value is:"<<(dataType(-1)*A[rows-1][columns - 1]).toString()<<"\n";
+    }
 }
     
+/*
+void readFraction(fraction &a){
+
+}
+
+void readRow(vector< vector<fraction> > &A, int row, int variables){
+
+}
+
+void readProblem(vector< vector<fraction> > &A){
+    int variables, restrictions;
+    cin>>variables>>restrictions;
+    A.resize(restrictions + 1);
+    loop(i, 0, restrictions + 1)
+        A[i].resize(variables + 1);
+    
+    readRow(A, restrictions);
+    loop(i, 0, restrictions)
+        readRow(A, i);
+
+}
+*/
 
 int main(){
     vector< vector<fraction> >A;
     /*this represents the problem:
-        max z = x1 + x2 
+        min z = x1 + 2x2 
         sa. 
-            x2 <= 1/3 * x + 3
-            x2 >= 2x - 4
-        which has max at (3, 2) with z = 5
+            3x1 + 4x2 <= 20
+            2x1 - x2 >= 2
+        which has min at (1,0) with z = 1
     */
-    fraction a1[] = {fraction(-1), fraction(3), fraction(1), fraction (0), fraction(3) };
-    fraction a2[] = {fraction(2), fraction(-1), fraction(0), fraction (1), fraction(4)};
-    fraction a3[] = {fraction(-1), fraction(-1), fraction(0), fraction (0), fraction(0)};
+    fraction a1[] = {fraction(3), fraction(4), fraction(1), fraction (0), fraction(20) };
+    fraction a2[] = {fraction(2), fraction(-1), fraction(0), fraction (-1), fraction(2)};
+    fraction a3[] = {fraction(1), fraction(2), fraction(0), fraction (0), fraction(0)};
     
     int size = sizeof(a1)/sizeof(a1[0]);
     A.push_back(vector<fraction> (a1, a1+size));

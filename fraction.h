@@ -42,7 +42,7 @@ void print(vector<vector<dataType> > &A){
         return;
     }
     int cols = A[0].size();
-    cout<<"Estado actual de A\n";
+    cout<<"Current state of A\n";
     loop(i, 0, rows){
         loop(j, 0, cols)
             cout<<A[i][j].toString()<<"\t\t";
