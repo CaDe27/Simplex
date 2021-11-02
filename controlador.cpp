@@ -11,9 +11,3 @@ int main(){
     
     twoPhaseSimplexMethod(A);
 }
-
-
-
-
-
-
