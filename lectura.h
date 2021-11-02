@@ -128,20 +128,30 @@ void readLinearExp(string &line,
 //vector< vector <fraction> > 
 template <class dataType> 
 vector< vector<dataType> > read(unordered_map<string, int> &positiveVariables, 
-          unordered_map<string, int> &freeVariables){
+          unordered_map<string, int> &freeVariables, bool &isMinProblem){
     
     //we read the positive variables 
     int nextVariable = 0;
     readVariableNames(true, positiveVariables, nextVariable);
     readVariableNames(false, freeVariables, nextVariable);
-    //read cost function 
+    
     string line;
+    //read type of problem
+    getline(cin, line);
+    line = eraseSpaces(line);
+    line = line.substr(line.find(':') + 1);
+    dataType problemMultiplier = line == "min"? dataType(1) : dataType(-1);
+    isMinProblem = line == "min";
+
+    //read cost function 
     getline(cin, line);
     line = eraseSpaces(line);
     line = line.substr(line.find(':') + 1);
     vector<dataType> costFunction(nextVariable + 1);
     readLinearExp<dataType>(line, costFunction, positiveVariables, freeVariables);
-    
+    loop(i, 0, nextVariable + 1)
+        costFunction[i] = costFunction[i]*problemMultiplier;
+
     //read restrictions
     getline(cin, line);
     

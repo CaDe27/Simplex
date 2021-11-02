@@ -51,7 +51,12 @@ int newPivotRow(vector< vector<dataType> > &A, int column){
     int rows = A.size(), pivotRow = -1, lastColumn = A[0].size() - 1;
     dataType epsilon = -1;
     loop(rowIterator, 0, rows-1){
-        if(A[rowIterator][column] > dataType(0) && (pivotRow == -1 || A[rowIterator][lastColumn]/A[rowIterator][column] < epsilon)){
+        //you can be a pivot if your value is greaer than zero
+        //you are a better pivot if your epsilon is less than the current one
+        if( A[rowIterator][column] > dataType(0)
+            &&
+            (pivotRow == -1 || A[rowIterator][lastColumn]/A[rowIterator][column] < epsilon))
+        {
             pivotRow = rowIterator;
             epsilon = A[rowIterator][lastColumn]/A[rowIterator][column]; 
         }
@@ -65,7 +70,7 @@ int newPivotRow(vector< vector<dataType> > &A, int column){
     (it either reaches an optimal value or stops if there is no optimal)
 */
 template <class dataType>
-void simplex(vector<vector<dataType> > &A, vector<int> &canonical){
+bool simplex(vector<vector<dataType> > &A, vector<int> &canonical){
     //select the variable used as a pivot
     int rows = A.size(), columns = A[0].size();
     int indexNewVariable, pivotRow = -1;
@@ -90,14 +95,14 @@ void simplex(vector<vector<dataType> > &A, vector<int> &canonical){
             pivotRow = newPivotRow(A, indexNewVariable);
             //if the pivotRow == -1, all entries are negative or zero
             //and the problem has no optimal solution
-            if(indexNewVariable == -1){
+            if(pivotRow == -1){
                 cout<<"there is no row to use as pivot, the problem has no optimal value"<<endl;
                 noOptimalExists = true;
             }
         }
         if(hasReachedOptimal || noOptimalExists) break;
 
-        cout<<"pivot row"<<pivotRow<<"\n";
+        cout<<"pivot row: "<<pivotRow<<"\n";
         //we store the new basic variable and the canonical vector
         //it represents
         canonical[pivotRow] = indexNewVariable;
@@ -115,6 +120,7 @@ void simplex(vector<vector<dataType> > &A, vector<int> &canonical){
             }
         }
     }while(!(hasReachedOptimal || noOptimalExists));
+    return hasReachedOptimal;
 }
 
 template<class dataType>
@@ -257,33 +263,25 @@ bool transformToSecondPhaseMatrix(vector< vector<dataType> > &A, vector<int> &ca
         represented by A
 */
 template <class dataType> 
-void twoPhaseSimplexMethod(vector< vector<dataType> > &A){
+bool twoPhaseSimplexMethod(vector< vector<dataType> > &A, vector<int> &canonical){
     validateData(A);
     int rows = A.size(), restrictions = rows - 1, costRow = rows - 1, columns = A[0].size();
     vector<dataType> costFunctionCoefficients = A[costRow];
-    vector<int> canonical(restrictions);
+    canonical.resize(restrictions);
     transformToFirstPhaseMatrix(A, canonical);
     cout<<"\n ========== We start the first phase problem\n";
     simplex(A, canonical);
     //we construct the second phase matrix 
     //we do it anyway since A is modified with the method
-    bool solutionSpaceEmpty = transformToSecondPhaseMatrix(A, canonical, costFunctionCoefficients);
+    bool reachedOptimal = false,
+         solutionSpaceEmpty = transformToSecondPhaseMatrix(A, canonical, costFunctionCoefficients);
     cout<<"\n ========== We start the second phase problem\n";
     if(solutionSpaceEmpty)
         cout<<"The solution space is empty and we cannot proceed\n";
-    else{
-        simplex(A, canonical);
-        cout<<endl;
-        //we fill the original variables values
-        vector<dataType> originalV(columns - 1, dataType(0));
-        loop(i, 0, rows - 1)
-            originalV[ canonical[i] ] = A[i][columns - 1];
-        
-        cout<<"State of the standard problem variables: "<<endl;
-        loop(i, 0, columns - 1)
-            cout<<originalV[i].toString()<<" ";
-        cout<<endl;
-        cout<<"optimal value is:"<<(dataType(-1)*A[rows-1][columns - 1]).toString()<<"\n";
-    }
+    else
+        reachedOptimal = simplex(A, canonical);
+    return solutionSpaceEmpty? solutionSpaceEmpty : reachedOptimal;
 }
+
+
 
