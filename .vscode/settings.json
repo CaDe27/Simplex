@@ -4,6 +4,11 @@
         "iosfwd": "cpp",
         "iterator": "cpp",
         "limits": "cpp",
-        "iostream": "cpp"
+        "iostream": "cpp",
+        "__locale": "cpp",
+        "unordered_map": "cpp",
+        "utility": "cpp",
+        "string": "cpp",
+        "istream": "cpp"
     }
 }

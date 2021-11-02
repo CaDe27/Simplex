@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include "fraction.h"
+#include "lectura.h"
 using namespace std;
 
 #define loop(i, a, b) for(int i = a; i < b; ++i)
@@ -283,23 +283,3 @@ void readProblem(vector< vector<fraction> > &A){
 }
 */
 
-int main(){
-    vector< vector<fraction> >A;
-    /*this represents the problem:
-        min z = x1 + 2x2 
-        sa. 
-            3x1 + 4x2 <= 20
-            2x1 - x2 >= 2
-        which has min at (1,0) with z = 1
-    */
-    fraction a1[] = {fraction(3), fraction(4), fraction(1), fraction (0), fraction(20) };
-    fraction a2[] = {fraction(2), fraction(-1), fraction(0), fraction (-1), fraction(2)};
-    fraction a3[] = {fraction(1), fraction(2), fraction(0), fraction (0), fraction(0)};
-    
-    int size = sizeof(a1)/sizeof(a1[0]);
-    A.push_back(vector<fraction> (a1, a1+size));
-    A.push_back(vector<fraction> (a2, a2+size));
-    A.push_back(vector<fraction> (a3, a3+size));
-    twoPhaseSimplexMethod(A);
-    //simplex(A);
-}
