@@ -2,8 +2,5 @@ variables positivas: x1, x2
 variables libres: 
 funcion de costo: x1 + x2 
 restricciones:
-x1 <= 20
-x2 <= 2
-x1 >= 1
-x2 >= 2
+x1 = 20
 fin

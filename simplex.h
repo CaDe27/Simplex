@@ -109,7 +109,7 @@ void simplex(vector<vector<dataType> > &A, vector<int> &canonical){
 
         //make all the other cells in the column 0
         loop(i, 0, rows){
-            if(i != pivotRow){
+            if(i != pivotRow && !(A[i][indexNewVariable] == dataType(0))){
                 cout<<"\tR"<<i<<" <- R"<<i<<" - ("<<A[i][indexNewVariable].toString()<<")R"<<pivotRow<<endl;
                 sumMultipleOfRow(A, pivotRow, i, A[i][indexNewVariable]);
             }
@@ -195,6 +195,33 @@ bool transformToSecondPhaseMatrix(vector< vector<dataType> > &A, vector<int> &ca
     //if the first phase doesn't have 0 as the answer, then the solution space of the 
     //original problem is empty
     bool solutionSpaceIsEmpty = !(optimalValueOfFirstPhase == dataType(0));
+    //we make sure there are no canonicals in the part we are going to eliminate
+    cout<<"Additional steps to have a basis in the original problem\n";
+    if(!solutionSpaceIsEmpty){
+        loop(i, 0, rows - 1){
+            if(canonical[i] >= columns - 1){
+                //we iterate over the i-th file to choose a new basic variable from the original problem
+                //for this canonical vector
+                int j = 0;
+                while(j < columns - 1 && canonical[i] >= columns -1){
+                    if(!(A[i][j] == dataType(0))){
+                        canonical[i] = j;
+                        cout<<"\tR"<<i<<" <- ("<<(dataType(1)/A[i][j]).toString()<<")R"<<i<<endl;
+                        rescaleRow(A, i, dataType(1)/A[i][j]);
+                        //make all the other cells in the column 0
+                        loop(z, 0, rows){
+                            if(z != i &&  !(A[z][j] == dataType(0))){
+                                cout<<"\tR"<<z<<" <- R"<<z<<" - ("<<A[z][j].toString()<<")R"<<i<<endl;
+                                sumMultipleOfRow(A, i, z, A[z][j]);
+                            }
+                        }
+                    }
+                    ++j;
+                }
+            }
+        }
+    }
+
 
     //we take bi to original bi column and resize the row
     loop(i, 0, rows){
@@ -259,27 +286,4 @@ void twoPhaseSimplexMethod(vector< vector<dataType> > &A){
         cout<<"optimal value is:"<<(dataType(-1)*A[rows-1][columns - 1]).toString()<<"\n";
     }
 }
-    
-/*
-void readFraction(fraction &a){
-
-}
-
-void readRow(vector< vector<fraction> > &A, int row, int variables){
-
-}
-
-void readProblem(vector< vector<fraction> > &A){
-    int variables, restrictions;
-    cin>>variables>>restrictions;
-    A.resize(restrictions + 1);
-    loop(i, 0, restrictions + 1)
-        A[i].resize(variables + 1);
-    
-    readRow(A, restrictions);
-    loop(i, 0, restrictions)
-        readRow(A, i);
-
-}
-*/
 
