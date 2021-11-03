@@ -246,6 +246,7 @@ bool transformToSecondPhaseMatrix(vector< vector<dataType> > &A, vector<int> &ca
     if (!solutionSpaceIsEmpty){
         //we make the basis vectors relative costs equal to zero 
         loop(i, 0, rows - 1){
+            if(A[rows - 1][ canonical[i] ] == 0) continue;
             cout<<"\tR"<<(rows-1)<<" <- R"<<(rows - 1)<<" - ("<<A[rows - 1][ canonical[i] ].toString()<<")R"<<i<<endl;
             sumMultipleOfRow(A, i, rows - 1, A[rows - 1][ canonical[i] ]);
             print(A);

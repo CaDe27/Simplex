@@ -1,9 +1,6 @@
 variables positivas:
-variables libres: x1, x2
-tipo de problema: max
-funcion de costo:  x1 + x2
+variables libres: 
+tipo de problema: min
+funcion de costo:  
 restricciones:
-x1 + x2 <= 20
-x1 <= 20
-x2 <= 1
 fin
