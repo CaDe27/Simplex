@@ -123,6 +123,9 @@ bool simplex(vector<vector<dataType> > &A, vector<int> &canonical){
     return hasReachedOptimal;
 }
 
+/*
+    the method validates the matrix is not empty on any dimension. 
+*/
 template<class dataType>
 void validateData(vector< vector<dataType> > &A){
     int rows = A.size();
@@ -133,6 +136,10 @@ void validateData(vector< vector<dataType> > &A){
         throw "There are no columns in matrix";
 }
 
+/*
+    given the original standard problem matrix, it return the first phase matrix
+    is empty or not
+*/
 template<class dataType>
 void transformToFirstPhaseMatrix(vector< vector<dataType> > &A, vector<int> &canonical){
     cout<<"Original standard problem matrix\n";
@@ -193,6 +200,11 @@ void transformToFirstPhaseMatrix(vector< vector<dataType> > &A, vector<int> &can
     print(A);
 }
 
+/*
+    given the current state of the first phase matrix and the variables contaning the canonical vectors
+    it transforms the matrix to the second phase matrix and tells whether the solution
+    is empty or not
+*/
 template<class dataType>
 bool transformToSecondPhaseMatrix(vector< vector<dataType> > &A, vector<int> &canonical, vector<dataType> &costFunctionCoefficients){
     int rows = A.size(), columns = A[0].size() - (rows - 1), firstPhaseColumns = A[0].size();

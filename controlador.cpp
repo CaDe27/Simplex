@@ -34,6 +34,14 @@ void displayVariableValues(vector< vector< fraction > > &A,
 
 }
 
+
+/*
+    This method coordinates all others. 
+    It call the read method to read the problem description 
+        from the text file and get the standard problem matrix
+    It calls the twoPhaseMethod to solve the problem and displays 
+        the message depending on whether we found a solution or not 
+*/
 int main(){
     //if(fopen("problem.txt", "r")) freopen("problem.txt", "r", stdin);
     unordered_map<string, int> positiveVariables;

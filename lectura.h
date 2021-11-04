@@ -7,6 +7,7 @@
 
 using namespace std;
 
+//It erases all spaces from the given string
 string eraseSpaces(string &str){
     string resp = "";
     string :: iterator it;
@@ -30,6 +31,10 @@ fraction readFraction(string &s, int indx1, int indx2){
     return fraction(numerator, denominator);
 }
 
+/*
+    This method extracts the variableNames from a string and stores the name 
+    and the respective index in the map.
+*/
 void readVariableNames(bool positiveVariables, unordered_map<string, int> &variablesMap, int &nextVariable){
     string line, variableName;
     getline(cin, line);
@@ -58,7 +63,11 @@ void readVariableNames(bool positiveVariables, unordered_map<string, int> &varia
     
 }
 
-
+/*
+    this problem identifies the coefficient and variable name from a string
+    example from string "12cost1" identifies 12 as a coeffiecient and cost1 as 
+    the variable name
+*/
 template <class dataType>
 void readNormalVariable(string &line, int startIndx, int endIndx, dataType &coef, string &variable){
     //we look for the first character that is a letter
@@ -125,7 +134,12 @@ void readLinearExp(string &line,
     }
 }
 
-//vector< vector <fraction> > 
+/*
+    Main procedure of the program. 
+    It is in charge of reading from the textfile as specified in the document 
+    and it stores the variable names in positiveVariables and freeVariables maps
+    it also returns a bool value to tell whether it is a mininum or maximum problem
+*/
 template <class dataType> 
 vector< vector<dataType> > read(unordered_map<string, int> &positiveVariables, 
           unordered_map<string, int> &freeVariables, bool &isMinProblem){
