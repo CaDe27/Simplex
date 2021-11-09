@@ -63,6 +63,7 @@ int main(){
     }
     else{
         cout<<"problem didn't reach optimal value"<<endl;
+        cout<<"last state of A:"<<endl;
         print(A);
     }
 }

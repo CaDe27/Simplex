@@ -293,7 +293,7 @@ bool twoPhaseSimplexMethod(vector< vector<dataType> > &A, vector<int> &canonical
         cout<<"The solution space is empty and we cannot proceed\n";
     else
         reachedOptimal = simplex(A, canonical);
-    return solutionSpaceEmpty? solutionSpaceEmpty : reachedOptimal;
+    return solutionSpaceEmpty? false : reachedOptimal;
 }
 
 
